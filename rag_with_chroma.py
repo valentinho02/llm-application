@@ -8,7 +8,12 @@
 
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-
+from langchain_openai import OpenAIEmbeddings
+from dotenv import load_dotenv
+from langchain_chroma import Chroma
+from langchain_openai import ChatOpenAI
+from langchain_classic import hub
+from langchain_classic.chains import RetrievalQA
 
 text_splitter = RecursiveCharacterTextSplitter(
     chunk_size = 1500,
@@ -16,9 +21,49 @@ text_splitter = RecursiveCharacterTextSplitter(
 )
 
 loader = Docx2txtLoader('./tax.docx')
-document = loader.load_and_split(text_splitter=text_splitter)
-print(len(document))
+document_list = loader.load_and_split(text_splitter=text_splitter)
+print(len(document_list))
 
 """
 recursively splitter : 리스트로 구분자를 주어 여러가지로 구분할 수 있다
 """
+load_dotenv()
+embedding = OpenAIEmbeddings(model='text-embedding-3-large')
+
+#database = Chroma.from_documents(documents = document_list, embedding=embedding, collection_name='chroma-tax', persist_directory="./chroma")
+database = Chroma(collection_name='chroma-tax', persist_directory="./chroma", embedding_function=embedding) # 생성된 파일 가져오기
+query = '연봉 5천만원인 직장인의 소득세는 얼마인가요?' 
+retreived_docs = database.similarity_search(query, k=2) #default 는 4
+
+print(retreived_docs)
+
+llm = ChatOpenAI(model = 'gpt-4o')
+
+prompt = f"""[Identity]
+-당신은 최고의 한국 소득세 전문가입니다
+-[Context]를 참고해서 사용자의 질문에 답변해주세요
+
+[Context]
+{retreived_docs}
+
+Question: {query}
+"""
+
+ai_message = llm.invoke(prompt)
+print(ai_message.content)
+
+from langsmith import Client
+
+client = Client()
+prompt = client.pull_prompt(
+    "rlm/rag-prompt",
+    dangerously_pull_public_prompt=True
+)
+
+qa_chain = RetrievalQA.from_chain_type(
+    llm,
+    retriever = database.as_retriever(),
+    chain_type_kwargs = {"prompt" : prompt}
+)
+aimessage = qa_chain({"query" : query})
+print(ai_message)
