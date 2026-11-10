@@ -1,0 +1,52 @@
+# API clients and environment
+openai
+python-dotenv
+tiktoken
+httpx
+tenacity
+
+# RAG frameworks
+langchain
+langchain-openai
+# Ragas imports the legacy VertexAI module removed in 0.4.2.
+langchain-community==0.4.1
+langchain-text-splitters
+langchain-chroma
+llama-index-core
+llama-index-llms-openai
+llama-index-embeddings-openai
+llama-index-readers-file
+
+# Vector search, local embeddings, and keyword retrieval
+chromadb
+faiss-cpu
+qdrant-client
+sentence-transformers
+rank-bm25
+
+# Document loading and preprocessing
+pypdf
+pymupdf
+python-docx
+beautifulsoup4
+lxml
+markdown
+openpyxl
+
+# Data exploration and notebooks
+numpy
+pandas
+scipy
+scikit-learn
+matplotlib
+seaborn
+jupyterlab
+ipykernel
+ipywidgets
+tqdm
+
+# Evaluation and demo apps
+datasets
+ragas
+streamlit
+pytest
