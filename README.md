@@ -35,7 +35,7 @@
 python3.13 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-python -m pip install langchain-classic langchain-pinecone
+python -m pip install langchain-classic langchain-pinecone docx2txt
 ```
 
 프로젝트 루트의 `.env`에 `OPENAI_API_KEY`를 설정합니다. Pinecone을 사용한다면 `PINECONE_API_KEY`도 설정합니다.
